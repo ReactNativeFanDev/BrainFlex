@@ -1,98 +1,81 @@
-import React, {useCallback} from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { memo, useContext } from 'react';
+import { StyleSheet, Text, View, Image, Pressable} from 'react-native';
+import { Colors, Ratio } from '../../constants/styles';
+import { LangContext } from '../../store/auth-context';
+import DATA from '../../constants/Data';
 
 
-const windowheight = Dimensions.get("window").height;
-const windowwidth = Dimensions.get("window").width;
-const windowsquare = Math.round(windowheight*windowwidth);
+function Header ({menuPressHandler, languagePressHandler}) {
+
+    const langCtx = useContext(LangContext);
+    const languageIndx = langCtx.langIdx;
+
+    return (
+        <View style={styles.mainContainer}> 
+            <Pressable 
+                onPress={menuPressHandler}
+                style={({pressed}) => [
+                    styles.buttonContainer, pressed && styles.buttonPressed
+                ]}
+            >
+                <Image
+                    style={styles.iconMenu}
+                    source={require("../../drawable/menu.png")} 
+                />
+            </Pressable>
 
 
-function Header ({...props}) {
-
-  const navigation = useNavigation();
-
-  const MenuButtonPress = useCallback(async () => {
-    await AsyncStorage.setItem('ThisMustBeForGoodPressButt', "true");
-    navigation.openDrawer();
-  }, [navigation]);
-  
-  const languageButtonPress = useCallback(async () => {
-    await AsyncStorage.setItem('ThisMustBeForGoodPressButt', "true");
-    navigation.navigate(props.DrawerNavigatorLanguage);
-  }, [navigation, props.DrawerNavigatorLanguage]);
-
-  return (
-    <View>
-
-      
-      <View style={styles.MenuButtonView}>
-        <TouchableOpacity onPress={() => MenuButtonPress()} style={styles.MenuButtonInvisible}>
-          <Image
-            style={styles.MenuButton}
-            source={require("../../android/app/src/main/res/drawable/menu.png")} 
-          />
-        </TouchableOpacity>
-      </View>
-
-
-      <View style={styles.languageButtonView}>
-        <TouchableOpacity 
-          onPress={() => languageButtonPress()}
-          style={styles.languageButtonInvisible}
-        >
-          <Text style={styles.languagetype}>{props.Lang}</Text>
-          <Image
-              style={styles.languageButton}
-              source={require("../../android/app/src/main/res/drawable/language.png")} 
-          />
-        </TouchableOpacity>
-      </View>
-
-
-    </View>
-  );
+            <Pressable
+                onPress={languagePressHandler}
+                style={({pressed})=>[
+                    styles.languageContainer, styles.buttonContainer, pressed && styles.buttonPressed
+                ]}
+            >
+                <Text style={styles.text}>{DATA[languageIndx].Lang}</Text>
+                <Image
+                    style={styles.iconLanguage}
+                    source={require("../../drawable/language.png")} 
+                />
+            </Pressable>
+        </View>
+    );
 }
 
-export default Header = React.memo(Header);
+export default Header = memo(Header);
+
 
 const styles = StyleSheet.create({
-    MenuButtonView:{
-      position: 'absolute',
-      left: 0,
-      top: 0,
+    mainContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingTop: Ratio.deviceWidth < 430 ? (Ratio.deviceWidth < 390 ? (Ratio.deviceWidth < 375 ? 10 : 20 ) : 40 ): 45,
     },
-    MenuButtonInvisible: {
-      backgroundColor: 'transparent',
-      alignItems: 'center',
-      width: Math.round(windowwidth*0.19),
-      height: Math.round(windowheight*0.035*2+windowwidth*0.07),
+    buttonContainer: {
+        marginHorizontal: 20,
     },
-    MenuButton: {
-      marginTop: Math.round(windowheight*0.035),
-      width: Math.round(windowwidth*0.07),
-      height: Math.round(windowwidth*0.07),
+    languageContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
-    languageButtonView: {
-      position: 'absolute',
-      right: Math.round(windowwidth*0.054),
-      top: 0,
+    buttonPressed: {
+        opacity: 0.75,
     },
-    languageButtonInvisible: {
-      flexDirection: 'row',
-      backgroundColor: 'transparent',
-      height: Math.round(windowheight*0.02875*2+windowwidth*0.097),
+    iconMenu: {
+        height: Ratio.size < 2.1 ? 30 : (Ratio.size > 2.3 ? 38 : 36),
+        width: Ratio.size < 2.1 ? 30 : (Ratio.size > 2.3 ? 38 : 36),
+        marginRight: 20,
+        marginBottom: 12,
     },
-    languageButton: {
-      marginTop: Math.round(windowheight*0.02875),
-      width: Math.round(windowwidth*0.097),
-      height: Math.round(windowwidth*0.097),
+    iconLanguage: {
+        height: Ratio.size < 2.1 ? 40 : (Ratio.size > 2.3 ? 48 : 46),
+        width: Ratio.size < 2.1 ? 40 : (Ratio.size > 2.3 ? 48 : 46),
+        marginBottom: 14,
     },
-    languagetype: {
-      marginTop: Math.round(windowwidth*0.016+windowheight*0.02875),
-      paddingRight: Math.round(windowwidth*0.0045),
-      color: '#FFFFFF',
-      fontSize: Math.round(windowsquare*0.00006),
+    text: {
+        color: Colors.White,
+        fontSize: Ratio.size < 2.1 ? 17 : (Ratio.size > 2.2 ? 28 : 25),
+        paddingRight: 3,
     },
 });
