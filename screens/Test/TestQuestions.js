@@ -4,6 +4,7 @@ import TestButtonLine from '../../components/button/TestButtonLine';
 import { Colors, Ratio } from '../../constants/styles';
 import { LangContext } from '../../store/auth-context';
 import DATA from '../../constants/Data';
+import Timer from '../../components/timer/Timer';
 
 const AgeBonus = [
     {
@@ -46,15 +47,17 @@ const AgeBonus = [
 ]
 
 
-
- 
-
 function TestQuestions({ageIndex, QuestionList, endTest}){
     const langCtx = useContext(LangContext);
     const languageIndx = langCtx.langIdx;
 
     const [testPage, setTestPage] = useState(0);
+    const testEnd = useRef(false);
     const answear = useRef([]);
+
+    function setTestEnd() {
+        testEnd.current = true;
+    }
     
     function calculate() {
         const rate = answear.current.filter(x=>x==1).length;
@@ -62,7 +65,6 @@ function TestQuestions({ageIndex, QuestionList, endTest}){
         const randomValue = QuestionList.length > 20 ? Math.floor(Math.random() * 4) : Math.floor(Math.random() * 2.15);
         const totalResult = (baseValue + randomValue + AgeBonus[ageIndex].age);
         endTest(totalResult);
-        
     }
     
     function previous() {
@@ -70,17 +72,19 @@ function TestQuestions({ageIndex, QuestionList, endTest}){
     }
     
     function next() {
-        testPage < QuestionList.length - 1 ? setTestPage(current => current + 1) : calculate();
+        (testPage < QuestionList.length - 1 & testEnd.current == false) ? setTestPage(current => current + 1) : calculate();
     }
 
     const pushRightAnswear = (answer) => {
         answer != undefined && ((answear.current[testPage]=answer) | next());
     }
 
+
+
     return(
         <SafeAreaView style={styles.testNavigationContainer}>
-
-            <Text style={styles.timerText}>10:13</Text>
+        
+            <Timer timeEnd={setTestEnd}/>
             
             <View>
                 <Image source={QuestionList[testPage].QuestionImage} style={styles.testQuestionImage}/>
@@ -139,11 +143,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignSelf: "center",
         justifyContent: 'space-between',
-    },
-    timerText: {
-        color: 'white',
-        fontSize: Ratio.deviceHight < 700 ? 30 : 36,
-        textAlign: 'center'
     },
     testQuestionImage: {
         width: Ratio.deviceWidth*0.78+20, 

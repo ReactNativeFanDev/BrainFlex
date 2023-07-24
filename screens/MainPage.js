@@ -1,4 +1,4 @@
-import {Component, useContext, useState} from 'react';
+import {Component, useContext} from 'react';
 import { StyleSheet, Text, Pressable, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Lottie from 'lottie-react-native';
